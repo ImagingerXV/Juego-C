@@ -1,0 +1,130 @@
+#include "raylib.h"
+
+// PANTALLAS DEL JUEGO
+typedef enum
+{
+	PANTALLA_INICIO,
+	PANTALLA_SELECCION_MODO,
+	PANTALLA_JUEGO
+} GameScreen;
+
+int main(void)
+{
+	// TAMAÑO DE LA VENTANA
+	const int screenWidth = 800;
+	const int screenHeight = 600;
+
+	InitWindow(screenWidth, screenHeight, "Math Drive");
+
+	// CARGAR DE IMÁGENES
+	Texture2D texFondoInicio = LoadTexture("inicio.png");
+	Texture2D texFondoModos = LoadTexture("jugar.png");
+	Texture2D texBotonJugar = LoadTexture("iniciar.png");
+
+	// ESTIRAR IMAGENES
+
+	// FONDO INICIO
+	Rectangle sourceInicio = {0, 0, (float)texFondoInicio.width, (float)texFondoInicio.height};
+	// PONER FONDO DE TAMAÑO DE VENTANA
+	Rectangle destInicio = {0, 0, (float)screenWidth, (float)screenHeight};
+
+	// FONDO MODOS
+	Rectangle sourceModos = {0, 0, (float)texFondoModos.width, (float)texFondoModos.height};
+	// PONER FONDO DE TAMAÑO DE VENTANA
+	Rectangle destModos = {0, 0, (float)screenWidth, (float)screenHeight};
+
+	// BOTON JUGAR
+	Rectangle sourceBoton = {0, 0, (float)texBotonJugar.width, (float)texBotonJugar.height};
+	// { X, Y, ANCHO, ALTO }
+	Rectangle destBoton = {200, 440, 400, 80};
+
+	// INICIAR EN PANTALLA INICIO
+	GameScreen currentScreen = PANTALLA_INICIO;
+	Vector2 mousePoint = {0.0f, 0.0f};
+
+	SetTargetFPS(60);
+
+	// PROGRAMA PANTALLA DE INICIO
+	while (!WindowShouldClose())
+	{
+		mousePoint = GetMousePosition();
+
+		switch (currentScreen)
+		{
+		case PANTALLA_INICIO:
+		{
+			// DETECTAR CLICK AL BOTON JUGAR
+			if (CheckCollisionPointRec(mousePoint, destBoton))
+			{
+				if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+				{
+					currentScreen = PANTALLA_SELECCION_MODO;
+				}
+			}
+		}
+		break;
+
+		case PANTALLA_SELECCION_MODO:
+		{
+			// REGRESAR CON ESCAPE
+			if (IsKeyPressed(KEY_BACKSPACE))
+			{
+				currentScreen = PANTALLA_INICIO;
+			}
+		}
+		break;
+
+		case PANTALLA_JUEGO:
+			break;
+		}
+
+		// DIBUJADO DE FONDOS
+		BeginDrawing();
+
+		ClearBackground(RAYWHITE);
+
+		switch (currentScreen)
+		{
+		case PANTALLA_INICIO:
+		{
+			// DIBUJAR FONDO PANTALLA DE INICIO
+			DrawTexturePro(texFondoInicio, sourceInicio, destInicio, (Vector2){0, 0}, 0.0f, WHITE);
+
+			// DIBUJAR BOTON DE JUGAR
+			DrawTexturePro(texBotonJugar, sourceBoton, destBoton, (Vector2){0, 0}, 0.0f, WHITE);
+
+			// EFECTO DE BRILLO AL PASAR EL MOUSE
+			if (CheckCollisionPointRec(mousePoint, destBoton))
+			{
+				DrawRectangleRec(destBoton, Fade(WHITE, 0.3f));
+			}
+		}
+		break;
+
+		case PANTALLA_SELECCION_MODO:
+		{
+			// DIBUJAR FONDO DE SELECCION DE MODOS
+			DrawTexturePro(texFondoModos, sourceModos, destModos, (Vector2){0, 0}, 0.0f, WHITE);
+		}
+		break;
+
+		case PANTALLA_JUEGO:
+		{
+			DrawText("JUEGO", 100, 100, 40, BLACK);
+		}
+		break;
+		}
+
+		EndDrawing();
+	}
+
+	// QUITAR TEXTURAS
+	UnloadTexture(texFondoInicio);
+	UnloadTexture(texFondoModos);
+	UnloadTexture(texBotonJugar);
+
+	// CERRAR
+	CloseWindow();
+
+	return 0;
+}
